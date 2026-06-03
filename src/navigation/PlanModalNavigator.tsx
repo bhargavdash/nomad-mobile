@@ -5,8 +5,17 @@ import ItineraryReveal from '@screens/ItineraryReveal';
 import PlanTrip from '@screens/PlanTrip';
 import ResearchTicker from '@screens/ResearchTicker';
 
+/** Prefill payload when the user taps a trending destination on Home. */
+export type TrendingPick = {
+  name: string;
+  country: string;
+  duration: string;
+  blurb: string;
+  vibes: string[];
+};
+
 export type PlanModalParamList = {
-  PlanTrip: undefined;
+  PlanTrip: { trendingPick?: TrendingPick } | undefined;
   ResearchTicker: { tripId: string };
   ItineraryReveal: { tripId: string };
 };

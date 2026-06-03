@@ -61,7 +61,7 @@ function AnimatedRow({ index, children }: { index: number; children: React.React
   return <Animated.View style={[styles.rowSpacing, style]}>{children}</Animated.View>;
 }
 
-export default function Adventures() {
+export default function MyTrips() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 

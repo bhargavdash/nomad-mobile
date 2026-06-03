@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useCallback, useState, useRef } from 'react';
@@ -104,6 +104,8 @@ function AccommodationCard({ icon, label, desc, active, onPress }: Accommodation
 export default function PlanTrip() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<PlanModalParamList>>();
+  const route = useRoute<RouteProp<PlanModalParamList, 'PlanTrip'>>();
+  const trendingPick = route.params?.trendingPick ?? null;
 
   // Zustand store
   const destination = useTripPlanStore((s) => s.destination);
@@ -113,6 +115,7 @@ export default function PlanTrip() {
   const accommodation = useTripPlanStore((s) => s.accommodation);
   const pace = useTripPlanStore((s) => s.pace);
   const budget = useTripPlanStore((s) => s.budget);
+  const preferences = useTripPlanStore((s) => s.preferences);
 
   const setDestination = useTripPlanStore((s) => s.setDestination);
   const setDates = useTripPlanStore((s) => s.setDates);
@@ -121,11 +124,19 @@ export default function PlanTrip() {
   const setAccommodation = useTripPlanStore((s) => s.setAccommodation);
   const setPace = useTripPlanStore((s) => s.setPace);
   const setBudget = useTripPlanStore((s) => s.setBudget);
+  const setPreferences = useTripPlanStore((s) => s.setPreferences);
   const setCurrentTripId = useTripPlanStore((s) => s.setCurrentTripId);
   const reset = useTripPlanStore((s) => s.reset);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const isValid = destination.trim().length > 0;
+  const [noteDismissed, setNoteDismissed] = useState(false);
+
+  // Web parity: a trip needs a destination, a traveler count, and a date range.
+  const missingFields: string[] = [];
+  if (!destination.trim()) missingFields.push('destination');
+  if (!travelers) missingFields.push('traveler count');
+  if (!dates.from || !dates.to) missingFields.push('travel dates');
+  const isValid = missingFields.length === 0;
 
   // Reset store when modal is dismissed
   useEffect(() => {
@@ -134,6 +145,15 @@ export default function PlanTrip() {
     });
     return unsubscribe;
   }, [navigation, reset]);
+
+  // Prefill the destination from a trending deep-link (web parity: destination
+  // only, and only when empty so we never clobber what the user has typed).
+  useEffect(() => {
+    if (!trendingPick) return;
+    if (destination.trim()) return;
+    setDestination(`${trendingPick.name}, ${trendingPick.country}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trendingPick]);
 
   // Staggered animations
   const headerAnim = useStaggeredEntry(0);
@@ -145,7 +165,6 @@ export default function PlanTrip() {
   const preferencesAnim = useStaggeredEntry(6);
 
   const scrollRef = useRef<ScrollView>(null);
-  const [preferences, setPreferences] = useState('');
 
   const handleClose = useCallback(() => {
     navigation.goBack();
@@ -236,6 +255,41 @@ export default function PlanTrip() {
               <Text style={styles.heroSubtitle}>{"Let's curate your perfect escape."}</Text>
             </View>
           </View>
+
+          {/* ── Trending pick note (Home deep-link) ── */}
+          {trendingPick && !noteDismissed && (
+            <View style={styles.trendingNote}>
+              <View style={styles.trendingNoteHead}>
+                <View style={styles.trendingNoteEyebrowChip}>
+                  <Text style={styles.trendingNoteEyebrow}>✦ From the trending picks</Text>
+                </View>
+                <Pressable onPress={() => setNoteDismissed(true)} hitSlop={10}>
+                  <Text style={styles.trendingNoteDismiss}>✕</Text>
+                </Pressable>
+              </View>
+              <Text style={styles.trendingNoteTitle}>
+                {trendingPick.name}
+                {trendingPick.country && trendingPick.country !== trendingPick.name ? (
+                  <Text style={styles.trendingNoteCountry}> · {trendingPick.country}</Text>
+                ) : null}
+              </Text>
+              <Text style={styles.trendingNoteMeta}>
+                {trendingPick.duration} · pre-filled below
+              </Text>
+              {trendingPick.blurb ? (
+                <Text style={styles.trendingNoteBlurb}>{`"${trendingPick.blurb}"`}</Text>
+              ) : null}
+              {trendingPick.vibes.length > 0 && (
+                <View style={styles.trendingNoteVibes}>
+                  {trendingPick.vibes.map((v) => (
+                    <View key={v} style={styles.trendingNoteVibe}>
+                      <Text style={styles.trendingNoteVibeText}>{v}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+          )}
 
           {/* ── The Essentials ── */}
           <Animated.View style={essentialsAnim}>
@@ -364,6 +418,9 @@ export default function PlanTrip() {
             onPress={handlePlanTrip}
             disabled={!isValid || isSubmitting}
           />
+          {!isValid && (
+            <Text style={styles.ctaHint}>Add {missingFields.join(', ')} to continue</Text>
+          )}
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -600,5 +657,100 @@ const styles = StyleSheet.create({
     color: '#424750',
     minHeight: 160,
     textAlignVertical: 'top',
+  },
+
+  // Trending pick note (Home deep-link)
+  trendingNote: {
+    backgroundColor: colors.emberLight,
+    borderWidth: 1.5,
+    borderColor: 'rgba(196,98,58,0.3)',
+    borderRadius: radius.card,
+    padding: spacing.xl,
+    marginBottom: spacing.lg,
+  },
+  trendingNoteHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  trendingNoteEyebrowChip: {
+    backgroundColor: 'rgba(196,98,58,0.15)',
+    borderRadius: 100,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  trendingNoteEyebrow: {
+    fontFamily: fontFamily.monoMedium,
+    fontSize: 10,
+    lineHeight: 14,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    color: colors.ember,
+  },
+  trendingNoteDismiss: {
+    fontSize: 15,
+    color: colors.muted,
+  },
+  trendingNoteTitle: {
+    fontFamily: fontFamily.display,
+    fontSize: 24,
+    lineHeight: 28,
+    color: colors.ink,
+    marginTop: spacing.md,
+  },
+  trendingNoteCountry: {
+    fontFamily: fontFamily.body,
+    fontSize: 16,
+    color: colors.muted,
+  },
+  trendingNoteMeta: {
+    fontFamily: fontFamily.mono,
+    fontSize: 11,
+    lineHeight: 16,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: colors.muted,
+    marginTop: spacing.xs,
+  },
+  trendingNoteBlurb: {
+    fontFamily: fontFamily.body,
+    fontStyle: 'italic',
+    fontSize: 14,
+    lineHeight: 22,
+    color: colors.ink,
+    borderLeftWidth: 2,
+    borderLeftColor: 'rgba(196,98,58,0.4)',
+    paddingLeft: spacing.md,
+    marginTop: spacing.md,
+  },
+  trendingNoteVibes: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: spacing.md,
+  },
+  trendingNoteVibe: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 100,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  trendingNoteVibeText: {
+    fontFamily: fontFamily.mono,
+    fontSize: 10,
+    lineHeight: 14,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    color: colors.muted,
+  },
+  ctaHint: {
+    fontFamily: fontFamily.body,
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.muted,
+    textAlign: 'center',
+    marginTop: spacing.sm,
   },
 });

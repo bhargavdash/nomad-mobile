@@ -3,6 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
+import RemoteImage from '@components/media/RemoteImage';
 import { colors } from '@theme/colors';
 import { radius } from '@theme/radius';
 import { shadows } from '@theme/shadows';
@@ -15,9 +16,12 @@ interface DestinationCardProps {
   name: string;
   country: string;
   duration: string;
+  /** Emoji + label badge derived from the destination's first vibe tag. */
   signal: string;
-  emoji: string;
-  bg: readonly [string, string];
+  /** Server-resolved place image. Null → deterministic Unsplash fallback. */
+  imageUrl?: string | null;
+  /** Drives the fallback image when imageUrl is null or errors. */
+  fallbackQuery: string;
   onPress?: () => void;
 }
 
@@ -26,8 +30,8 @@ export default function DestinationCard({
   country,
   duration,
   signal,
-  emoji,
-  bg,
+  imageUrl,
+  fallbackQuery,
   onPress,
 }: DestinationCardProps) {
   const scale = useSharedValue(1);
@@ -46,12 +50,10 @@ export default function DestinationCard({
       }}
       onPress={onPress}
     >
-      {/* Photo area with gradient */}
-      <LinearGradient colors={[bg[0], bg[1]]} style={styles.photoArea}>
-        <Text style={styles.emoji}>{emoji}</Text>
-        {/* Bottom gradient overlay */}
+      {/* Photo area — real resolved image with a dark bottom overlay */}
+      <RemoteImage src={imageUrl} fallbackQuery={fallbackQuery} style={styles.photoArea}>
         <LinearGradient colors={['transparent', 'rgba(28,25,23,0.85)']} style={styles.overlay} />
-      </LinearGradient>
+      </RemoteImage>
 
       {/* Card content */}
       <View style={styles.content}>
@@ -79,12 +81,7 @@ const styles = StyleSheet.create({
   },
   photoArea: {
     height: 110,
-    alignItems: 'center',
-    justifyContent: 'center',
     position: 'relative',
-  },
-  emoji: {
-    fontSize: 36,
   },
   overlay: {
     position: 'absolute',

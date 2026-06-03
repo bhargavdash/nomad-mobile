@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
+import RemoteImage from '@components/media/RemoteImage';
 import { colors } from '@theme/colors';
 import { radius } from '@theme/radius';
 import { shadows } from '@theme/shadows';
@@ -43,9 +44,7 @@ export default function TripCard({ trip, onPress }: TripCardProps) {
       }}
       onPress={onPress}
     >
-      <View style={styles.emojiBox}>
-        <Text style={styles.emoji}>{trip.emoji ?? '🧭'}</Text>
-      </View>
+      <RemoteImage src={trip.heroImageUrl} fallbackQuery={trip.destination} style={styles.thumb} />
 
       <View style={styles.body}>
         <View style={styles.topRow}>
@@ -95,17 +94,11 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: spacing.lg,
   },
-  emojiBox: {
+  thumb: {
     width: 48,
     height: 48,
     borderRadius: radius.iconBox,
-    backgroundColor: colors.cream,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginRight: spacing.md,
-  },
-  emoji: {
-    fontSize: 24,
   },
   body: {
     flex: 1,
