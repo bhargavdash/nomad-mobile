@@ -3,17 +3,17 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 
-import BottomTabBar from '../components/navigation/BottomTabBar';
-import Adventures from '../screens/Adventures';
+import BottomTabBar from '../components/Navigation/BottomTabBar';
 import Home from '../screens/Home';
 import InTripCompanion from '../screens/InTripCompanion';
+import MyTrips from '../screens/MyTrips';
 import Profile from '../screens/Profile';
 
 import type { RootStackParamList } from './RootNavigator';
 
 const SCREENS: Record<string, React.ComponentType> = {
   home: Home,
-  adventures: Adventures,
+  mytrips: MyTrips,
   today: InTripCompanion,
   profile: Profile,
 };

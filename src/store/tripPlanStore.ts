@@ -15,7 +15,7 @@ export type AccommodationType =
 
 export type PaceType = 'Slow & Soulful' | 'Balanced' | 'Action-Packed';
 
-export type BudgetTier = '$' | '$$' | '$$$' | '$$$$';
+export type BudgetTier = 'Low' | 'Medium' | 'High' | 'Very-High';
 
 export interface DateRange {
   from: string | null;
@@ -30,6 +30,7 @@ interface TripPlanState {
   accommodation: AccommodationType | null;
   pace: PaceType | null;
   budget: BudgetTier | null;
+  preferences: string;
   currentTripId: string | null;
 }
 
@@ -41,6 +42,7 @@ interface TripPlanActions {
   setAccommodation: (value: AccommodationType) => void;
   setPace: (value: PaceType) => void;
   setBudget: (value: BudgetTier) => void;
+  setPreferences: (value: string) => void;
   setCurrentTripId: (id: string) => void;
   reset: () => void;
 }
@@ -53,6 +55,7 @@ const INITIAL_STATE: TripPlanState = {
   accommodation: null,
   pace: null,
   budget: null,
+  preferences: '',
   currentTripId: null,
 };
 
@@ -77,6 +80,8 @@ export const useTripPlanStore = create<TripPlanState & TripPlanActions>()((set) 
   setPace: (value) => set({ pace: value }),
 
   setBudget: (value) => set({ budget: value }),
+
+  setPreferences: (value) => set({ preferences: value }),
 
   setCurrentTripId: (id) => set({ currentTripId: id }),
 

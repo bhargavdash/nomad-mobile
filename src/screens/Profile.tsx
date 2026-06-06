@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import UserAvatar from '@components/misc/UserAvatar';
+import UserAvatar from '@components/Misc/UserAvatar';
 import { useAuthStore } from '@store/authStore';
 import { colors } from '@theme/colors';
 import { layout, spacing } from '@theme/spacing';

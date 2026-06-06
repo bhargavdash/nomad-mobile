@@ -1,3 +1,4 @@
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { ActivityIndicator, View } from 'react-native';
@@ -8,11 +9,11 @@ import { colors } from '../theme/colors';
 
 import AuthNavigator from './AuthNavigator';
 import MainTabNavigator from './MainTabNavigator';
-import PlanModalNavigator from './PlanModalNavigator';
+import PlanModalNavigator, { type PlanModalParamList } from './PlanModalNavigator';
 
 export type RootStackParamList = {
   Main: undefined;
-  PlanModal: undefined;
+  PlanModal: NavigatorScreenParams<PlanModalParamList> | undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();

@@ -2,22 +2,32 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 
 import { colors } from '@theme/colors';
+import { radius } from '@theme/radius';
+import { shadows } from '@theme/shadows';
+import { spacing } from '@theme/spacing';
 import { fontFamily } from '@theme/typography';
 
-export default function HeroCard() {
+interface HeroCTACardProps {
+  /** Opens the plan modal. */
+  onPress: () => void;
+}
+
+/** Shown on Home when the user has no active trip — invites them to plan one. */
+export default function HeroCard({ onPress }: HeroCTACardProps) {
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, shadows.cardResting]}>
       <Text style={styles.headline}>
-        Your next{' '}
-        <Text style={{ color: '#C4623A', fontStyle: 'italic', fontWeight: 'bold' }}>adventure</Text>{' '}
-        begins here.
+        Your next <Text style={styles.accent}>adventure</Text> begins here.
       </Text>
       <Text style={styles.body}>
-        We have curated a list of destinations that match your passion for coastal architecture and
-        hidden mountain trails.
+        Tell us a vibe — we&apos;ll dig through the YouTube vlogs, Reddit threads, and the blogs
+        nobody finds, then write you a day-by-day itinerary.
       </Text>
-      <Pressable style={styles.button}>
-        <Text style={styles.buttonText}>Itinerary Repo</Text>
+      <Pressable
+        style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
+        onPress={onPress}
+      >
+        <Text style={styles.buttonText}>Plan a trip</Text>
       </Pressable>
     </View>
   );
@@ -26,20 +36,21 @@ export default function HeroCard() {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.warmWhite,
-    padding: 20,
-  },
-  eyebrow: {
-    fontFamily: fontFamily.body,
-    fontSize: 13,
-    color: colors.muted,
-    marginBottom: 6,
+    borderRadius: radius.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.xl,
   },
   headline: {
     fontFamily: fontFamily.display,
-    fontSize: 38,
-    lineHeight: 38,
+    fontSize: 30,
+    lineHeight: 34,
     color: colors.ink,
     paddingBottom: 10,
+  },
+  accent: {
+    color: colors.ember,
+    fontStyle: 'italic',
   },
   body: {
     fontFamily: fontFamily.body,
@@ -51,9 +62,12 @@ const styles = StyleSheet.create({
   button: {
     alignSelf: 'flex-start',
     backgroundColor: colors.ember,
-    borderRadius: 100,
+    borderRadius: radius.pill,
     paddingVertical: 12,
     paddingHorizontal: 24,
+  },
+  buttonPressed: {
+    backgroundColor: colors.emberDim,
   },
   buttonText: {
     fontFamily: fontFamily.labelStrong,
