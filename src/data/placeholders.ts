@@ -9,16 +9,24 @@ export const SOURCE_BADGE_COLORS = {
 
 export const VIBE_CATEGORIES = [
   {
-    label: 'Food + Drink',
-    vibes: ['Local cuisines', 'Street food', 'Chai stops', 'Fine dining'],
+    label: 'Food',
+    vibes: ['Local favorites', 'Street food', 'Aesthetic cafes', 'Luxury dining'],
   },
   {
     label: 'Explore',
-    vibes: ['Photo spots', 'Heritage walks', 'Handicrafts', 'Hidden gems', 'Sunrise spots'],
+    vibes: [
+      'Hidden gems',
+      'Photo stops',
+      'Sunrise points',
+      'Religious places',
+      'History & archaeology',
+      'Beaches',
+      'Mountains',
+    ],
   },
   {
     label: 'Shopping',
-    vibes: ['Local Markets', 'Luxury Boutiques', 'Artisan Crafts', 'Souvenirs'],
+    vibes: ['Handlooms', 'Local markets', 'Handicrafts', 'Souvenirs'],
   },
 ];
 
