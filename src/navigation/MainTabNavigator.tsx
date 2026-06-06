@@ -3,7 +3,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 
-import BottomTabBar from '../components/navigation/BottomTabBar';
+import BottomTabBar from '../components/Navigation/BottomTabBar';
 import Home from '../screens/Home';
 import InTripCompanion from '../screens/InTripCompanion';
 import MyTrips from '../screens/MyTrips';

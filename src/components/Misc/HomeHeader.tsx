@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import UserAvatar from '@components/misc/UserAvatar';
+import UserAvatar from '@components/Misc/UserAvatar';
 import { useAuthStore } from '@store/authStore';
 import { colors } from '@theme/colors';
 import { layout } from '@theme/spacing';

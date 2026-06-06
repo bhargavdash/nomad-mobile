@@ -21,10 +21,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import ActiveTripCard from '@components/cards/ActiveTripCard';
-import DestinationCard from '@components/cards/DestinationCard';
-import HeroCard from '@components/cards/HeroCard';
-import HomeHeader from '@components/misc/HomeHeader';
+import ActiveTripCard from '@components/Cards/ActiveTripCard';
+import DestinationCard from '@components/Cards/DestinationCard';
+import HeroCard from '@components/Cards/HeroCard';
+import HomeHeader from '@components/Misc/HomeHeader';
 import { api } from '@lib/api';
 import type { TrendingPick } from '@navigation/PlanModalNavigator';
 import type { RootStackParamList } from '@navigation/RootNavigator';

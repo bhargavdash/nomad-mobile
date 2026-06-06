@@ -19,7 +19,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import TripCard from '@components/cards/TripCard';
+import TripCard from '@components/Cards/TripCard';
 import { api } from '@lib/api';
 import type { RootStackParamList } from '@navigation/RootNavigator';
 import { colors } from '@theme/colors';

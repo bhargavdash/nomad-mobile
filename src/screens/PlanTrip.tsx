@@ -25,8 +25,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import PrimaryButton from '@components/buttons/PrimaryButton';
 import KeywordChip from '@components/chips/KeywordChip';
-import DateRangePicker from '@components/forms/DateRangePicker';
-import LocationSearchInput from '@components/forms/LocationSearchInput';
+import DateRangePicker from '@components/Forms/DateRangePicker';
+import LocationSearchInput from '@components/Forms/LocationSearchInput';
 import {
   VIBE_CATEGORIES,
   ACCOMMODATION_OPTIONS,
