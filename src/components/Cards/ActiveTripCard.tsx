@@ -1,8 +1,10 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
-import { colors, darkText, darkOverlay, statusBadge } from '@theme/colors';
+import RemoteImage from '@components/media/RemoteImage';
+import { colors, darkText, statusBadge } from '@theme/colors';
 import { radius } from '@theme/radius';
 import { shadows } from '@theme/shadows';
 import { spacing } from '@theme/spacing';
@@ -15,7 +17,7 @@ interface ActiveTripCardProps {
   dateFrom: string;
   dateTo: string;
   duration: number;
-  stats: { places: number; tips: number; photoStops: number };
+  heroImageUrl?: string | null;
   onPress?: () => void;
 }
 
@@ -24,7 +26,7 @@ export default function ActiveTripCard({
   dateFrom,
   dateTo,
   duration,
-  stats,
+  heroImageUrl,
   onPress,
 }: ActiveTripCardProps) {
   const scale = useSharedValue(1);
@@ -43,16 +45,26 @@ export default function ActiveTripCard({
       }}
       onPress={onPress}
     >
-      {/* Glow A — ember, top-right */}
-      <View style={styles.glowA} />
-      {/* Glow B — peach, bottom-left */}
-      <View style={styles.glowB} />
+      {/* Hero photo — full-bleed background */}
+      <RemoteImage
+        src={heroImageUrl}
+        fallbackQuery={destination}
+        style={StyleSheet.absoluteFill}
+        priority="high"
+      />
+      {/* Subtle scrim — transparent top, light navy at bottom for text legibility */}
+      <LinearGradient
+        colors={['transparent', 'rgba(27,43,75,0.35)', 'rgba(27,43,75,0.65)']}
+        locations={[0, 0.55, 1]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
 
       {/* Content */}
       <View style={styles.content}>
         {/* Status badge */}
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>● Upcoming · {dateFrom}</Text>
+          <Text style={styles.badgeText}>● Active trip</Text>
         </View>
 
         {/* Trip title */}
@@ -60,24 +72,8 @@ export default function ActiveTripCard({
 
         {/* Meta */}
         <Text style={styles.meta}>
-          {dateFrom} – {dateTo} · {duration} days · {stats.places} places
+          {dateFrom} – {dateTo} · {duration} days
         </Text>
-
-        {/* Stats row */}
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.places}</Text>
-            <Text style={styles.statLabel}>PLACES</Text>
-          </View>
-          <View style={[styles.statItem, styles.statBorder]}>
-            <Text style={styles.statNumber}>{stats.tips}</Text>
-            <Text style={styles.statLabel}>TIPS</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statNumber}>{stats.photoStops}</Text>
-            <Text style={styles.statLabel}>PHOTO STOPS</Text>
-          </View>
-        </View>
 
         {/* Inner CTA */}
         <View style={styles.cta}>
@@ -95,26 +91,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.activeTripCard,
     overflow: 'hidden',
     position: 'relative',
-  },
-  glowA: {
-    position: 'absolute',
-    width: 220,
-    height: 220,
-    borderRadius: 110,
-    backgroundColor: colors.ember,
-    opacity: 0.2,
-    top: -60,
-    right: -60,
-  },
-  glowB: {
-    position: 'absolute',
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: colors.peach,
-    opacity: 0.1,
-    bottom: -40,
-    left: -40,
+    minHeight: 260,
+    justifyContent: 'flex-end',
   },
   content: {
     padding: spacing.lg,
@@ -145,35 +123,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: darkText.meta,
     marginTop: 3,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    marginTop: spacing.lg,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: darkOverlay.overlay8,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statBorder: {
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderLeftColor: darkOverlay.overlay8,
-    borderRightColor: darkOverlay.overlay8,
-  },
-  statNumber: {
-    fontFamily: fontFamily.display,
-    fontSize: 16,
-    color: darkText.primary,
-  },
-  statLabel: {
-    fontFamily: fontFamily.body,
-    fontSize: 9,
-    color: darkText.stat,
-    letterSpacing: 0.5,
-    marginTop: 2,
   },
   cta: {
     flexDirection: 'row',

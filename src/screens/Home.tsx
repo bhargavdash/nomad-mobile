@@ -78,11 +78,7 @@ function renderHeroSlot(
         dateFrom={fmtShort(trip.dateFrom)}
         dateTo={fmtShort(trip.dateTo)}
         duration={trip.durationDays ?? 0}
-        stats={{
-          places: trip.statsPlaces,
-          tips: trip.statsTips,
-          photoStops: trip.statsPhotoStops,
-        }}
+        heroImageUrl={trip.heroImageUrl}
         onPress={() => onTrip(trip.id)}
       />
     );
@@ -131,7 +127,7 @@ export default function Home() {
   useEffect(() => {
     fetchTrips();
     fetchTrending();
-  }, []);
+  }, [fetchTrips, fetchTrending]);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -264,7 +260,6 @@ function TrendingRowContent({
           name={item.name}
           country={item.country}
           duration={item.duration}
-          signal={signalFromVibe(item.vibe_tags)}
           imageUrl={item.imageUrl ?? null}
           fallbackQuery={`${item.name} ${item.country}`}
           onPress={() => onPick(item)}
@@ -282,7 +277,6 @@ function TrendingRow({ index, eyebrow, title, accent, destinations, onPick }: Tr
 
   return (
     <Animated.View style={[styles.section, anim]}>
-      <Text style={styles.eyebrow}>{eyebrow}</Text>
       <Text style={styles.sectionTitle}>
         {title} <Text style={styles.accent}>{accent}</Text>
       </Text>
@@ -304,33 +298,6 @@ function Skeleton({ style }: { style?: StyleProp<ViewStyle> }) {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────
-
-const VIBE_BADGE: Record<string, string> = {
-  beach: 'Beach',
-  mountains: 'Mountains',
-  heritage: 'Heritage',
-  food: 'Foodie',
-  nightlife: 'Nightlife',
-  adventure: 'Adventure',
-  spiritual: 'Spiritual',
-  luxury: 'Luxury',
-  offbeat: 'Offbeat',
-  family: 'Family',
-  romance: 'Romance',
-  wellness: 'Wellness',
-  wildlife: 'Wildlife',
-  nature: 'Nature',
-  culture: 'Culture',
-  coastal: 'Coastal',
-  diving: 'Diving',
-};
-
-function signalFromVibe(tags: string[] | undefined): string {
-  const first = tags?.[0]?.toLowerCase();
-  if (first && VIBE_BADGE[first]) return VIBE_BADGE[first];
-  if (first) return `✦ ${first[0].toUpperCase()}${first.slice(1)}`;
-  return '✦ Trending';
-}
 
 function getTimeOfDay(): string {
   const hour = new Date().getHours();

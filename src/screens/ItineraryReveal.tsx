@@ -11,7 +11,6 @@ import {
   StatusBar,
   ActivityIndicator,
   Modal,
-  Share,
   type NativeSyntheticEvent,
   type NativeScrollEvent,
   type LayoutChangeEvent,
@@ -298,17 +297,6 @@ export default function ItineraryReveal() {
     navigation.getParent()?.goBack();
   }, [navigation]);
 
-  const handleShare = useCallback(async () => {
-    if (!data) return;
-    try {
-      await Share.share({
-        message: `My ${data.trip.destination} itinerary — planned with Nomad`,
-      });
-    } catch {
-      // user dismissed or share unavailable — nothing to recover
-    }
-  }, [data]);
-
   const updateStop = useCallback((stopId: string, fn: (s: TripStop) => TripStop) => {
     setData((prev) => applyStopUpdate(prev, stopId, fn));
   }, []);
@@ -450,9 +438,6 @@ export default function ItineraryReveal() {
             <View style={[styles.heroTopRow, { paddingTop: insets.top + spacing.sm }]}>
               <Pressable onPress={handleBack} style={styles.heroPill} hitSlop={8}>
                 <Text style={styles.heroPillText}>← Back</Text>
-              </Pressable>
-              <Pressable onPress={handleShare} style={styles.heroPill} hitSlop={8}>
-                <Text style={styles.heroPillText}>Share ↗</Text>
               </Pressable>
             </View>
             <View style={styles.heroBottom}>

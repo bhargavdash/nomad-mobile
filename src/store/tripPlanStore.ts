@@ -40,8 +40,8 @@ interface TripPlanActions {
   setTravelers: (value: TravelerCount) => void;
   toggleVibe: (vibe: string) => void;
   setAccommodation: (value: AccommodationType) => void;
-  setPace: (value: PaceType) => void;
-  setBudget: (value: BudgetTier) => void;
+  setPace: (value: PaceType | null) => void;
+  setBudget: (value: BudgetTier | null) => void;
   setPreferences: (value: string) => void;
   setCurrentTripId: (id: string) => void;
   reset: () => void;
