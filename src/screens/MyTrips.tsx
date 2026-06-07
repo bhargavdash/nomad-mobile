@@ -9,6 +9,7 @@ import {
   Pressable,
   StatusBar,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -69,9 +70,10 @@ export default function MyTrips() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [filter, setFilter] = useState<TripFilter>('all');
+  const [refreshing, setRefreshing] = useState(false);
 
-  const loadTrips = useCallback(async (isActive: () => boolean) => {
-    setLoading(true);
+  const loadTrips = useCallback(async (isActive: () => boolean, opts?: { silent?: boolean }) => {
+    if (!opts?.silent) setLoading(true);
     setError(false);
     try {
       const res = await api.get<{ trips: TripSummary[] }>('/trips');
@@ -79,9 +81,15 @@ export default function MyTrips() {
     } catch {
       if (isActive()) setError(true);
     } finally {
-      if (isActive()) setLoading(false);
+      if (isActive() && !opts?.silent) setLoading(false);
     }
   }, []);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await loadTrips(() => true, { silent: true });
+    setRefreshing(false);
+  }, [loadTrips]);
 
   useFocusEffect(
     useCallback(() => {
@@ -124,7 +132,18 @@ export default function MyTrips() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.cream} />
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.ember}
+            colors={[colors.ember]}
+          />
+        }
+      >
         <AnimatedRow index={0}>
           <Text style={styles.eyebrow}>Your travels</Text>
           <Text style={styles.title}>My Trips</Text>

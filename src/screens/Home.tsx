@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { AxiosError } from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ScrollView,
   FlatList,
   StatusBar,
+  RefreshControl,
   StyleProp,
   ViewStyle,
 } from 'react-native';
@@ -97,51 +98,47 @@ export default function Home() {
   const [tripsLoading, setTripsLoading] = useState(true);
   const [tripsError, setTripsError] = useState(false);
   const [trending, setTrending] = useState<TrendingResponse | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const headerAnim = useStaggeredEntry(0);
   const heroAnim = useStaggeredEntry(1);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await api.get<{ trips: TripSummary[] }>('/trips');
-        if (cancelled) return;
-        const active = res.data.trips.find((t) => t.status === 'active' || t.status === 'ready');
-        setActiveTrip(active ?? null);
-      } catch (err) {
-        if (!cancelled) {
-          const status = (err as AxiosError)?.response?.status;
-          // 429: server is busy — don't silently show the "plan a trip" hero.
-          // Any non-network error besides 401 is surfaced so user understands
-          // why their active trip isn't visible.
-          if (status && status !== 401) setTripsError(true);
-        }
-      } finally {
-        if (!cancelled) setTripsLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+  const fetchTrips = useCallback(async (opts?: { skipSpinner?: boolean }) => {
+    if (!opts?.skipSpinner) setTripsLoading(true);
+    setTripsError(false);
+    try {
+      const res = await api.get<{ trips: TripSummary[] }>('/trips');
+      const active = res.data.trips.find((t) => t.status === 'active' || t.status === 'ready');
+      setActiveTrip(active ?? null);
+    } catch (err) {
+      const status = (err as AxiosError)?.response?.status;
+      // 429: server is busy — don't silently show the "plan a trip" hero.
+      if (status && status !== 401) setTripsError(true);
+    } finally {
+      if (!opts?.skipSpinner) setTripsLoading(false);
+    }
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await api.get<TrendingResponse>('/trending');
-        if (cancelled) return;
-        setTrending(res.data);
-      } catch {
-        // Fall back to empty rows rather than spinning skeletons forever.
-        if (!cancelled) setTrending(EMPTY_TRENDING);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+  const fetchTrending = useCallback(async () => {
+    try {
+      const res = await api.get<TrendingResponse>('/trending');
+      setTrending(res.data);
+    } catch {
+      setTrending(EMPTY_TRENDING);
+    }
   }, []);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetchTrips();
+    fetchTrending();
+  }, []);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([fetchTrips({ skipSpinner: true }), fetchTrending()]);
+    setRefreshing(false);
+  }, [fetchTrips, fetchTrending]);
 
   const openPlan = () => navigation.navigate('PlanModal');
 
@@ -162,7 +159,18 @@ export default function Home() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.cream} />
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.ember}
+            colors={[colors.ember]}
+          />
+        }
+      >
         {/* ── Header + intro ── */}
         <Animated.View style={[styles.header, headerAnim]}>
           <HomeHeader />
