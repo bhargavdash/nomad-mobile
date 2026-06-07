@@ -46,7 +46,6 @@ export default function SignIn({ navigation }: Props) {
 
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
-    console.log('Initiating google signin..');
     const redirectTo = 'nomad://auth/callback';
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -57,11 +56,9 @@ export default function SignIn({ navigation }: Props) {
       Alert.alert('Google sign in failed', error?.message ?? 'Could not start sign in');
       return;
     }
-    console.log(`Supabase google signin result: data -  ${data.url}`);
     const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
     setGoogleLoading(false);
     if (result.type === 'success') {
-      console.log('Google oauth successful: ', result);
       await handleOAuthRedirect(result.url);
     }
   }

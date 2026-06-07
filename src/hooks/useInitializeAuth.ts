@@ -27,9 +27,7 @@ export function useInitializeAuth() {
       setSession(session);
 
       if (session) {
-        api
-          .post('/auth/sync')
-          .catch((error) => console.log('Sync failed:', error?.response?.data ?? error.message));
+        api.post('/auth/sync').catch(() => {});
       }
     });
 
