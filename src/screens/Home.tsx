@@ -128,7 +128,6 @@ export default function Home() {
     }
   }, []);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchTrips();
     fetchTrending();
@@ -307,23 +306,23 @@ function Skeleton({ style }: { style?: StyleProp<ViewStyle> }) {
 // ── Helpers ───────────────────────────────────────────────────────────────
 
 const VIBE_BADGE: Record<string, string> = {
-  beach: '🏖 Beach',
-  mountains: '🏔 Mountains',
-  heritage: '🏛 Heritage',
-  food: '🍜 Foodie',
-  nightlife: '🌃 Nightlife',
-  adventure: '🧗 Adventure',
-  spiritual: '🕉 Spiritual',
-  luxury: '✨ Luxury',
-  offbeat: '✦ Offbeat',
-  family: '👨‍👩‍👧 Family',
-  romance: '💞 Romance',
-  wellness: '🧘 Wellness',
-  wildlife: '🐅 Wildlife',
-  nature: '🌿 Nature',
-  culture: '🎭 Culture',
-  coastal: '🌊 Coastal',
-  diving: '🤿 Diving',
+  beach: 'Beach',
+  mountains: 'Mountains',
+  heritage: 'Heritage',
+  food: 'Foodie',
+  nightlife: 'Nightlife',
+  adventure: 'Adventure',
+  spiritual: 'Spiritual',
+  luxury: 'Luxury',
+  offbeat: 'Offbeat',
+  family: 'Family',
+  romance: 'Romance',
+  wellness: 'Wellness',
+  wildlife: 'Wildlife',
+  nature: 'Nature',
+  culture: 'Culture',
+  coastal: 'Coastal',
+  diving: 'Diving',
 };
 
 function signalFromVibe(tags: string[] | undefined): string {

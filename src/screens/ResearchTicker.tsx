@@ -262,13 +262,24 @@ export default function ResearchTicker() {
           <Text style={styles.discoveryLabel}>LIVE DISCOVERY</Text>
           <Text style={styles.discoveryTitle}>{currentDiscovery.title}</Text>
           <Text style={styles.discoveryBody}>{currentDiscovery.body}</Text>
-          <View style={styles.chipRow}>
-            {currentDiscovery.tags.map((tag) => (
-              <View key={tag} style={styles.tagChip}>
-                <Text style={styles.tagChipText}>{tag}</Text>
+          {(() => {
+            const cleanedTags = [
+              ...new Set(
+                currentDiscovery.tags
+                  .map((t) => t.replace(/^[^\p{L}\p{N}\s]+\s*/u, '').trim())
+                  .filter(Boolean),
+              ),
+            ];
+            return cleanedTags.length > 0 ? (
+              <View style={styles.chipRow}>
+                {cleanedTags.map((tag) => (
+                  <View key={tag} style={styles.tagChip}>
+                    <Text style={styles.tagChipText}>{tag}</Text>
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
+            ) : null;
+          })()}
         </Animated.View>
       </Animated.View>
 

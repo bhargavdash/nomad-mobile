@@ -1,3 +1,4 @@
+import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { AxiosError } from 'axios';
@@ -71,8 +72,10 @@ function useStaggeredEntry(index: number) {
 
 // --- Accommodation Card (local component) ---
 
+type FeatherName = React.ComponentProps<typeof Feather>['name'];
+
 interface AccommodationCardProps {
-  icon: string;
+  icon: FeatherName;
   label: string;
   desc: string;
   active: boolean;
@@ -88,7 +91,12 @@ function AccommodationCard({ icon, label, desc, active, onPress }: Accommodation
       ]}
       onPress={onPress}
     >
-      <Text style={styles.accommodationIcon}>{icon}</Text>
+      <Feather
+        name={icon}
+        size={22}
+        color={active ? colors.white : colors.ink}
+        style={styles.accommodationIcon}
+      />
       <Text style={[styles.accommodationLabel, active && styles.accommodationLabelActive]}>
         {label}
       </Text>
@@ -578,7 +586,6 @@ const styles = StyleSheet.create({
     borderColor: colors.navy,
   },
   accommodationIcon: {
-    fontSize: 28,
     marginBottom: spacing.sm,
   },
   accommodationLabel: {

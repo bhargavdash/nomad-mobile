@@ -1,8 +1,8 @@
 export const SOURCE_BADGE_COLORS = {
   youtube: { bg: '#E8593C', text: '#fff', label: '▶ YouTube' },
   reddit: { bg: '#FF4500', text: '#fff', label: 'R Reddit' },
-  blog: { bg: '#2A7A56', text: '#fff', label: '✍ Blog' },
-  maps: { bg: '#2E6FAA', text: '#fff', label: '📍 Maps' },
+  blog: { bg: '#2A7A56', text: '#fff', label: 'Blog' },
+  maps: { bg: '#2E6FAA', text: '#fff', label: 'Maps' },
 } as const;
 
 // --- Plan Your Trip data ---
@@ -31,14 +31,14 @@ export const VIBE_CATEGORIES = [
 ];
 
 export const ACCOMMODATION_OPTIONS = [
-  { icon: '🏡', label: 'Boutique Villa', desc: 'Private, curated, intimate' },
-  { icon: '🏨', label: 'Luxury Hotel', desc: 'Full-service, high-end amenities' },
-  { icon: '🌿', label: 'Eco Lodge', desc: 'Sustainable, close to nature' },
-  { icon: '🏠', label: 'Homestay', desc: 'Authentic, local living experiences' },
-  { icon: '🛋', label: 'Airbnb', desc: 'Unique stays in local neighborhoods' },
-  { icon: '🛏', label: 'Hostel', desc: 'Social, budget-friendly for solo travelers' },
-  { icon: '✨', label: 'Custom Stay', desc: 'Request specific lodging' },
-];
+  { icon: 'home', label: 'Boutique Villa', desc: 'Private, curated, intimate' },
+  { icon: 'star', label: 'Luxury Hotel', desc: 'Full-service, high-end amenities' },
+  { icon: 'feather', label: 'Eco Lodge', desc: 'Sustainable, close to nature' },
+  { icon: 'users', label: 'Homestay', desc: 'Authentic, local living experiences' },
+  { icon: 'key', label: 'Airbnb', desc: 'Unique stays in local neighborhoods' },
+  { icon: 'moon', label: 'Hostel', desc: 'Social, budget-friendly for solo travelers' },
+  { icon: 'plus-circle', label: 'Custom Stay', desc: 'Request specific lodging' },
+] as const;
 
 export const PACE_OPTIONS = ['Slow & Soulful', 'Balanced', 'Action-Packed'] as const;
 

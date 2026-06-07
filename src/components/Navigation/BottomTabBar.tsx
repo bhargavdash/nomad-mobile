@@ -1,5 +1,6 @@
+import { Feather } from '@expo/vector-icons';
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { colors } from '@theme/colors';
@@ -9,18 +10,20 @@ import { fontFamily } from '@theme/typography';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+type FeatherName = React.ComponentProps<typeof Feather>['name'];
+
 interface Tab {
   key: string;
   label: string;
-  icon: string;
+  icon: FeatherName;
 }
 
 const TABS: Tab[] = [
-  { key: 'home', label: 'Home', icon: '🏠' },
-  { key: 'mytrips', label: 'My Trips', icon: '🗺' },
-  { key: 'plan', label: 'Plan', icon: '+' },
-  { key: 'today', label: 'Today', icon: '📍' },
-  { key: 'profile', label: 'Profile', icon: '👤' },
+  { key: 'home', label: 'Home', icon: 'home' },
+  { key: 'mytrips', label: 'My Trips', icon: 'map' },
+  { key: 'plan', label: 'Plan', icon: 'plus' },
+  { key: 'today', label: 'Today', icon: 'navigation' },
+  { key: 'profile', label: 'Profile', icon: 'user' },
 ];
 
 interface BottomTabBarProps {
@@ -39,13 +42,12 @@ export default function BottomTabBar({ activeTab, onTabPress }: BottomTabBarProp
         const isActive = activeTab === tab.key;
         return (
           <Pressable key={tab.key} style={styles.tab} onPress={() => onTabPress(tab.key)}>
-            <Text style={styles.tabIcon}>{tab.icon}</Text>
+            <Feather name={tab.icon} size={20} color={isActive ? colors.ember : colors.muted} />
             <Text
               style={[styles.tabLabel, isActive ? styles.tabLabelActive : styles.tabLabelInactive]}
             >
               {tab.label}
             </Text>
-            {isActive && <View style={styles.activeDot} />}
           </Pressable>
         );
       })}
@@ -71,7 +73,7 @@ function FABButton({ onPress }: { onPress: () => void }) {
         }}
         onPress={onPress}
       >
-        <Text style={styles.fabIcon}>+</Text>
+        <Feather name="plus" size={24} color={colors.white} />
       </AnimatedPressable>
       <Text style={styles.tabLabelInactive}>Plan</Text>
     </View>
@@ -95,9 +97,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-  tabIcon: {
-    fontSize: 20,
-  },
   tabLabel: {
     fontSize: 10,
     marginTop: 3,
@@ -111,14 +110,6 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 10,
     marginTop: 3,
-  },
-  activeDot: {
-    position: 'absolute',
-    bottom: -4,
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.ember,
   },
   fabWrapper: {
     flex: 1,
@@ -134,11 +125,5 @@ const styles = StyleSheet.create({
     borderColor: colors.cream,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  fabIcon: {
-    fontSize: 24,
-    color: colors.white,
-    fontWeight: '300',
-    marginTop: Platform.OS === 'ios' ? -1 : -2,
   },
 });

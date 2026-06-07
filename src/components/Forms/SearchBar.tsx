@@ -1,5 +1,6 @@
+import { Feather } from '@expo/vector-icons';
 import React from 'react';
-import { Text, StyleSheet, Pressable } from 'react-native';
+import { StyleSheet, Pressable, Text } from 'react-native';
 
 import { colors } from '@theme/colors';
 import { radius } from '@theme/radius';
@@ -12,7 +13,7 @@ interface SearchBarProps {
 export default function SearchBar({ onPress }: SearchBarProps) {
   return (
     <Pressable style={styles.container} onPress={onPress}>
-      <Text style={styles.icon}>🔍</Text>
+      <Feather name="search" size={16} color={colors.muted} style={styles.icon} />
       <Text style={styles.placeholder}>Where do you want to go?</Text>
     </Pressable>
   );
@@ -28,7 +29,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   icon: {
-    fontSize: 16,
     marginRight: 8,
   },
   placeholder: {
