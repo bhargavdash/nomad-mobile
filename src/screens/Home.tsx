@@ -1,5 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { AxiosError } from 'axios';
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -94,6 +95,7 @@ export default function Home() {
 
   const [activeTrip, setActiveTrip] = useState<TripSummary | null>(null);
   const [tripsLoading, setTripsLoading] = useState(true);
+  const [tripsError, setTripsError] = useState(false);
   const [trending, setTrending] = useState<TrendingResponse | null>(null);
 
   const headerAnim = useStaggeredEntry(0);
@@ -107,8 +109,14 @@ export default function Home() {
         if (cancelled) return;
         const active = res.data.trips.find((t) => t.status === 'active' || t.status === 'ready');
         setActiveTrip(active ?? null);
-      } catch {
-        // Leave activeTrip null → the plan CTA shows.
+      } catch (err) {
+        if (!cancelled) {
+          const status = (err as AxiosError)?.response?.status;
+          // 429: server is busy — don't silently show the "plan a trip" hero.
+          // Any non-network error besides 401 is surfaced so user understands
+          // why their active trip isn't visible.
+          if (status && status !== 401) setTripsError(true);
+        }
       } finally {
         if (!cancelled) setTripsLoading(false);
       }
@@ -164,6 +172,13 @@ export default function Home() {
             real internet so you don&apos;t have to.
           </Text>
         </Animated.View>
+
+        {/* ── Fetch error notice (rate limit or network) ── */}
+        {tripsError && (
+          <View style={styles.fetchErrorBanner}>
+            <Text style={styles.fetchErrorText}>Couldn&apos;t load your trips — tap to retry.</Text>
+          </View>
+        )}
 
         {/* ── Hero slot — active trip or plan CTA ── */}
         <Animated.View style={[styles.heroWrapper, heroAnim]}>
@@ -332,6 +347,25 @@ const styles = StyleSheet.create({
   },
   scroll: {
     paddingBottom: layout.bottomNavHeight + spacing.xxl,
+  },
+
+  // Fetch error
+  fetchErrorBanner: {
+    marginHorizontal: layout.screenPadding,
+    marginTop: spacing.md,
+    backgroundColor: 'rgba(196,98,58,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(196,98,58,0.25)',
+    borderRadius: 12,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  fetchErrorText: {
+    fontFamily: fontFamily.body,
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.ember,
+    textAlign: 'center',
   },
 
   // Header + intro

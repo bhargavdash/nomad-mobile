@@ -119,6 +119,8 @@ export default function ResearchTicker() {
     currentDiscovery,
     discoveryOpacity,
     hasError,
+    isRateLimited,
+    retryAfterMs,
     retry,
   } = useResearchTicker(tripId, onComplete);
 
@@ -176,6 +178,25 @@ export default function ResearchTicker() {
   const sourcesAnim = useStaggeredEntry(5);
 
   const displayName = destination || 'your trip';
+
+  if (isRateLimited) {
+    const waitMin = retryAfterMs ? Math.ceil(retryAfterMs / 60_000) : 1;
+    return (
+      <View
+        style={[styles.container, styles.errorContainer, { paddingTop: insets.top + spacing.lg }]}
+      >
+        <StatusBar barStyle="dark-content" backgroundColor={colors.cream} />
+        <Text style={styles.rateLimitIcon}>⏱</Text>
+        <Text style={styles.errorTitle}>Server is busy</Text>
+        <Text style={styles.errorBody}>
+          {`Too many requests in a short window. Your trip is saved — wait about ${waitMin} minute${waitMin === 1 ? '' : 's'} and tap retry.`}
+        </Text>
+        <Pressable onPress={retry} style={styles.retryButton}>
+          <Text style={styles.retryLabel}>Retry</Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   if (hasError) {
     return (
@@ -496,6 +517,10 @@ const styles = StyleSheet.create({
   errorContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  rateLimitIcon: {
+    fontSize: 48,
+    marginBottom: spacing.xl,
   },
   errorTitle: {
     ...typography.displayM,

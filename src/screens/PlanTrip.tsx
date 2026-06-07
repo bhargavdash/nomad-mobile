@@ -1,5 +1,6 @@
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { AxiosError } from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useCallback, useState, useRef } from 'react';
 import {
@@ -12,7 +13,6 @@ import {
   KeyboardAvoidingView,
   Image,
   TextInput,
-  Alert,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -130,6 +130,7 @@ export default function PlanTrip() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [noteDismissed, setNoteDismissed] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Web parity: a trip needs a destination, a traveler count, and a date range.
   const missingFields: string[] = [];
@@ -173,6 +174,7 @@ export default function PlanTrip() {
   const handlePlanTrip = useCallback(async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const durationDays =
         dates.from && dates.to
@@ -203,7 +205,16 @@ export default function PlanTrip() {
       navigation.navigate('ResearchTicker', { tripId: trip.id });
     } catch (err) {
       console.error('[PlanTrip] POST /trips failed:', err);
-      Alert.alert('Failed to create trip', 'Something went wrong. Please try again.');
+      const status = (err as AxiosError)?.response?.status;
+      if (status === 429) {
+        const retryAfter = (err as AxiosError)?.response?.headers?.['retry-after'];
+        const waitMin = retryAfter ? Math.ceil(parseInt(retryAfter as string, 10) / 60) : 60;
+        setSubmitError(
+          `Trip limit reached — you've planned 10 trips this hour. Try again in about ${waitMin} minute${waitMin === 1 ? '' : 's'}.`,
+        );
+      } else {
+        setSubmitError('Something went wrong. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -418,7 +429,12 @@ export default function PlanTrip() {
             onPress={handlePlanTrip}
             disabled={!isValid || isSubmitting}
           />
-          {!isValid && (
+          {submitError && (
+            <View style={styles.submitErrorBanner}>
+              <Text style={styles.submitErrorText}>{submitError}</Text>
+            </View>
+          )}
+          {!isValid && !submitError && (
             <Text style={styles.ctaHint}>Add {missingFields.join(', ')} to continue</Text>
           )}
         </View>
@@ -752,5 +768,21 @@ const styles = StyleSheet.create({
     color: colors.muted,
     textAlign: 'center',
     marginTop: spacing.sm,
+  },
+  submitErrorBanner: {
+    marginTop: spacing.sm,
+    backgroundColor: 'rgba(196,98,58,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(196,98,58,0.3)',
+    borderRadius: 12,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+  },
+  submitErrorText: {
+    fontFamily: fontFamily.body,
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.ember,
+    textAlign: 'center',
   },
 });

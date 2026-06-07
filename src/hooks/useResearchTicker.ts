@@ -1,3 +1,4 @@
+import type { AxiosError } from 'axios';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSharedValue, withTiming, Easing } from 'react-native-reanimated';
 
@@ -53,6 +54,8 @@ export interface UseResearchTickerReturn {
   currentDiscovery: ResearchDiscovery;
   discoveryOpacity: ReturnType<typeof useSharedValue<number>>;
   hasError: boolean;
+  isRateLimited: boolean;
+  retryAfterMs: number | null;
   retry: () => void;
 }
 
@@ -64,6 +67,8 @@ export function useResearchTicker(tripId: string, onComplete: () => void): UseRe
   const [activeSource, setActiveSource] = useState('youtube');
   const [currentDiscovery, setCurrentDiscovery] = useState<ResearchDiscovery>(INITIAL_DISCOVERY);
   const [hasError, setHasError] = useState(false);
+  const [isRateLimited, setIsRateLimited] = useState(false);
+  const [retryAfterMs, setRetryAfterMs] = useState<number | null>(null);
   // Incrementing this triggers the polling useEffect to restart
   const [restartKey, setRestartKey] = useState(0);
 
@@ -75,6 +80,9 @@ export function useResearchTicker(tripId: string, onComplete: () => void): UseRe
   const isMounted = useRef(true);
   const isCompleted = useRef(false);
   const consecutiveFailures = useRef(0);
+  // Exponential backoff: skip poll ticks until this timestamp passes
+  const backoffUntil = useRef(0);
+  const backoffMs = useRef(POLL_INTERVAL);
 
   // Stable ref so the polling closure always calls the latest onComplete
   const onCompleteRef = useRef(onComplete);
@@ -93,7 +101,11 @@ export function useResearchTicker(tripId: string, onComplete: () => void): UseRe
     consecutiveFailures.current = 0;
     prevDiscoveriesLen.current = 0;
     isCompleted.current = false;
+    backoffUntil.current = 0;
+    backoffMs.current = POLL_INTERVAL;
     setHasError(false);
+    setIsRateLimited(false);
+    setRetryAfterMs(null);
     setDisplayProgress(0);
     setProgressLabel('STARTING RESEARCH...');
     setCurrentDiscovery(INITIAL_DISCOVERY);
@@ -117,6 +129,8 @@ export function useResearchTicker(tripId: string, onComplete: () => void): UseRe
     isMounted.current = true;
     isCompleted.current = false;
     consecutiveFailures.current = 0;
+    backoffUntil.current = 0;
+    backoffMs.current = POLL_INTERVAL;
 
     const handleResponse = (data: ResearchJobResponse) => {
       if (!isMounted.current || isCompleted.current) return;
@@ -159,11 +173,36 @@ export function useResearchTicker(tripId: string, onComplete: () => void): UseRe
     };
 
     const poll = async () => {
+      // Skip this tick if we're in an exponential-backoff window
+      if (Date.now() < backoffUntil.current) return;
+
       try {
         const res = await api.get<ResearchJobResponse>(`/trips/${tripId}/research`);
         consecutiveFailures.current = 0;
+        backoffMs.current = POLL_INTERVAL;
         handleResponse(res.data);
       } catch (err) {
+        const status = (err as AxiosError)?.response?.status;
+
+        // 429: rate limited — stop polling, surface specific state, do NOT
+        // auto-retry (hammering a rate-limited endpoint just wastes quota).
+        if (status === 429) {
+          const retryAfterHeader = (err as AxiosError)?.response?.headers?.['retry-after'];
+          const waitMs = retryAfterHeader
+            ? parseInt(retryAfterHeader as string, 10) * 1000
+            : 60_000;
+          stopPolling();
+          if (isMounted.current) {
+            setIsRateLimited(true);
+            setRetryAfterMs(waitMs);
+          }
+          return;
+        }
+
+        // 5xx / network: exponential backoff — double the wait on each failure,
+        // cap at 30s, then count toward the hard-stop threshold.
+        backoffMs.current = Math.min(backoffMs.current * 2, 30_000);
+        backoffUntil.current = Date.now() + backoffMs.current;
         consecutiveFailures.current += 1;
         console.warn(
           `[useResearchTicker] poll failed (${consecutiveFailures.current}/${MAX_CONSECUTIVE_FAILURES}):`,
@@ -195,6 +234,8 @@ export function useResearchTicker(tripId: string, onComplete: () => void): UseRe
     currentDiscovery,
     discoveryOpacity,
     hasError,
+    isRateLimited,
+    retryAfterMs,
     retry,
   };
 }
