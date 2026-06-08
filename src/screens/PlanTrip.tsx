@@ -28,12 +28,12 @@ import PrimaryButton from '@components/buttons/PrimaryButton';
 import KeywordChip from '@components/chips/KeywordChip';
 import DateRangePicker from '@components/Forms/DateRangePicker';
 import LocationSearchInput from '@components/Forms/LocationSearchInput';
+import TravelerPicker from '@components/Forms/TravelerPicker';
 import {
   VIBE_CATEGORIES,
   ACCOMMODATION_OPTIONS,
   PACE_OPTIONS,
   BUDGET_TIERS,
-  TRAVELER_OPTIONS,
 } from '@data/placeholders';
 import { api } from '@lib/api';
 import type { PlanModalParamList } from '@navigation/PlanModalNavigator';
@@ -42,7 +42,6 @@ import {
   type AccommodationType,
   type PaceType,
   type BudgetTier,
-  type TravelerCount,
 } from '@store/tripPlanStore';
 import { colors } from '@theme/colors';
 import { radius } from '@theme/radius';
@@ -328,16 +327,7 @@ export default function PlanTrip() {
 
             {/* Travelers */}
             <Text style={styles.fieldLabel}>Travelers</Text>
-            <View style={styles.chipRow}>
-              {TRAVELER_OPTIONS.map((opt) => (
-                <KeywordChip
-                  key={opt.value}
-                  label={opt.label}
-                  active={travelers === opt.value}
-                  onPress={() => setTravelers(opt.value as TravelerCount)}
-                />
-              ))}
-            </View>
+            <TravelerPicker travelers={travelers} setTravelers={setTravelers} />
           </Animated.View>
 
           {/* ── What's your vibe? ── */}

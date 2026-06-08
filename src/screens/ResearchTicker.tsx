@@ -204,12 +204,18 @@ export default function ResearchTicker() {
         style={[styles.container, styles.errorContainer, { paddingTop: insets.top + spacing.lg }]}
       >
         <StatusBar barStyle="dark-content" backgroundColor={colors.cream} />
-        <Text style={styles.errorTitle}>Something went wrong</Text>
+        <Text style={styles.rateLimitIcon}>⚠️</Text>
+        <Text style={styles.errorTitle}>We couldn&apos;t finish this trip</Text>
         <Text style={styles.errorBody}>
-          {"We couldn't complete the research for your trip. Please try again."}
+          {
+            "The research run didn't complete — this is usually temporary. Your trip details are saved, so you can start a fresh plan or come back to it later."
+          }
         </Text>
-        <Pressable onPress={retry} style={styles.retryButton}>
-          <Text style={styles.retryLabel}>Try Again</Text>
+        <Pressable onPress={() => navigation.navigate('PlanTrip')} style={styles.retryButton}>
+          <Text style={styles.retryLabel}>Start a new plan</Text>
+        </Pressable>
+        <Pressable onPress={() => navigation.getParent()?.goBack()} style={styles.secondaryButton}>
+          <Text style={styles.secondaryLabel}>Back to my trips</Text>
         </Pressable>
       </View>
     );
@@ -557,5 +563,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 20,
     color: colors.white,
+  },
+  secondaryButton: {
+    marginTop: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xl,
+  },
+  secondaryLabel: {
+    fontFamily: fontFamily.labelStrong,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.muted,
   },
 });

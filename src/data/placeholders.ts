@@ -44,12 +44,13 @@ export const PACE_OPTIONS = ['Slow & Soulful', 'Balanced', 'Action-Packed'] as c
 
 export const BUDGET_TIERS = ['Low', 'Medium', 'High', 'Very-High'] as const;
 
-export const TRAVELER_OPTIONS = [
-  { value: '1' as const, label: '1 Person' },
-  { value: '2' as const, label: '2 People' },
-  { value: '3+' as const, label: '3+ People' },
-  { value: 'large' as const, label: 'Large Group' },
-];
+// Exact traveller counts, 1–10 — rendered as a dropdown picker on the plan form.
+export const MAX_TRAVELERS = 10;
+
+export const TRAVELER_OPTIONS = Array.from({ length: MAX_TRAVELERS }, (_, i) => {
+  const n = i + 1;
+  return { value: String(n), label: `${n} ${n === 1 ? 'traveler' : 'travelers'}` };
+});
 
 // --- Research Ticker data ---
 

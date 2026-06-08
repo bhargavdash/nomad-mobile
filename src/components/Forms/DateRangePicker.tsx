@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   boxHasValue: {
-    borderColor: colors.navy,
+    borderColor: colors.ember,
   },
   boxLabel: {
     fontFamily: fontFamily.label,
