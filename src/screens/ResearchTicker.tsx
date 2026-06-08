@@ -48,15 +48,6 @@ function useStaggeredEntry(index: number) {
 
 // --- Sub-components ---
 
-function StatBox({ label, value }: { label: string; value: number }) {
-  return (
-    <View style={styles.statBox}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
 const SOURCE_PHASE_MAP: Record<string, number> = {
   youtube: 0,
   reddit: 1,
@@ -114,7 +105,6 @@ export default function ResearchTicker() {
     progress,
     progressLabel,
     displayProgress,
-    stats,
     activeSource,
     currentDiscovery,
     discoveryOpacity,
@@ -173,9 +163,8 @@ export default function ResearchTicker() {
   const titleAnim = useStaggeredEntry(0);
   const orbAnim = useStaggeredEntry(1);
   const progressAnim = useStaggeredEntry(2);
-  const statsAnim = useStaggeredEntry(3);
-  const discoveryAnim = useStaggeredEntry(4);
-  const sourcesAnim = useStaggeredEntry(5);
+  const discoveryAnim = useStaggeredEntry(3);
+  const sourcesAnim = useStaggeredEntry(4);
 
   const displayName = destination || 'your trip';
 
@@ -251,15 +240,6 @@ export default function ResearchTicker() {
         >
           <Animated.View style={[styles.progressFill, progressFillStyle]} />
         </View>
-      </Animated.View>
-
-      {/* Stats Row */}
-      <Animated.View style={[styles.statsRow, statsAnim]}>
-        <StatBox label="PLACES" value={stats.places} />
-        <View style={styles.statDivider} />
-        <StatBox label="TIPS" value={stats.tips} />
-        <View style={styles.statDivider} />
-        <StatBox label="PHOTO STOPS" value={stats.photoStops} />
       </Animated.View>
 
       {/* Live Discovery Card */}
@@ -389,42 +369,6 @@ const styles = StyleSheet.create({
     height: 6,
     backgroundColor: colors.navy,
     borderRadius: 3,
-  },
-
-  // Stats
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-    borderRadius: 18,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    marginBottom: spacing.xl,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  statBox: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statValue: {
-    ...typography.displayM,
-    color: colors.ink,
-  },
-  statLabel: {
-    fontFamily: fontFamily.mono,
-    fontSize: 10,
-    lineHeight: 14,
-    color: colors.muted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginTop: 2,
-  },
-  statDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: colors.border,
   },
 
   // Discovery

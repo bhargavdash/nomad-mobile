@@ -18,9 +18,9 @@ interface TripPlanState {
   dates: DateRange;
   travelers: string | null;
   selectedVibes: string[];
-  accommodation: AccommodationType | null;
-  pace: PaceType | null;
-  budget: BudgetTier | null;
+  accommodation: AccommodationType;
+  pace: PaceType;
+  budget: BudgetTier;
   preferences: string;
   currentTripId: string | null;
 }
@@ -31,8 +31,8 @@ interface TripPlanActions {
   setTravelers: (value: string) => void;
   toggleVibe: (vibe: string) => void;
   setAccommodation: (value: AccommodationType) => void;
-  setPace: (value: PaceType | null) => void;
-  setBudget: (value: BudgetTier | null) => void;
+  setPace: (value: PaceType) => void;
+  setBudget: (value: BudgetTier) => void;
   setPreferences: (value: string) => void;
   setCurrentTripId: (id: string) => void;
   reset: () => void;
@@ -43,9 +43,9 @@ const INITIAL_STATE: TripPlanState = {
   dates: { from: null, to: null },
   travelers: null,
   selectedVibes: [],
-  accommodation: null,
-  pace: null,
-  budget: null,
+  accommodation: 'Budget Hotel',
+  pace: 'Balanced',
+  budget: 'Medium',
   preferences: '',
   currentTripId: null,
 };

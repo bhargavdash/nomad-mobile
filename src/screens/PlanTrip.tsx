@@ -364,7 +364,7 @@ export default function PlanTrip() {
                   key={opt}
                   label={opt}
                   active={pace === opt}
-                  onPress={() => setPace(pace === opt ? null : (opt as PaceType))}
+                  onPress={() => setPace(opt as PaceType)}
                   variant="terracotta"
                 />
               ))}
@@ -380,7 +380,7 @@ export default function PlanTrip() {
                   key={tier}
                   label={tier}
                   active={budget === tier}
-                  onPress={() => setBudget(budget === tier ? null : (tier as BudgetTier))}
+                  onPress={() => setBudget(tier as BudgetTier)}
                   variant="terracotta"
                 />
               ))}
