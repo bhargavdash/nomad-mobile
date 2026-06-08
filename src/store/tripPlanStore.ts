@@ -2,14 +2,7 @@ import { create } from 'zustand';
 
 // --- Types ---
 
-export type AccommodationType =
-  | 'Boutique Villa'
-  | 'Luxury Hotel'
-  | 'Eco Lodge'
-  | 'Homestay'
-  | 'Airbnb'
-  | 'Hostel'
-  | 'Custom Stay';
+export type AccommodationType = 'Hostel' | 'Budget Hotel' | 'Luxury Hotel' | 'Airbnb / Homestay';
 
 export type PaceType = 'Slow & Soulful' | 'Balanced' | 'Action-Packed';
 

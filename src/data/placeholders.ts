@@ -31,13 +31,10 @@ export const VIBE_CATEGORIES = [
 ];
 
 export const ACCOMMODATION_OPTIONS = [
-  { icon: 'home', label: 'Boutique Villa', desc: 'Private, curated, intimate' },
-  { icon: 'star', label: 'Luxury Hotel', desc: 'Full-service, high-end amenities' },
-  { icon: 'feather', label: 'Eco Lodge', desc: 'Sustainable, close to nature' },
-  { icon: 'users', label: 'Homestay', desc: 'Authentic, local living experiences' },
-  { icon: 'key', label: 'Airbnb', desc: 'Unique stays in local neighborhoods' },
-  { icon: 'moon', label: 'Hostel', desc: 'Social, budget-friendly for solo travelers' },
-  { icon: 'plus-circle', label: 'Custom Stay', desc: 'Request specific lodging' },
+  'Hostel',
+  'Budget Hotel',
+  'Luxury Hotel',
+  'Airbnb / Homestay',
 ] as const;
 
 export const PACE_OPTIONS = ['Slow & Soulful', 'Balanced', 'Action-Packed'] as const;
