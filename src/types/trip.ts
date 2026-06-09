@@ -25,6 +25,7 @@ export type TripSummary = {
   seasonalTips: string[];
   stayByCity: Record<string, string> | null;
   budgetEstimate: string | null;
+  currencyAdvice: string | null;
   // City-led imagery — resolved server-side once and shipped with the trip.
   heroImageUrl: string | null;
   imagesResolvedAt: string | null;
