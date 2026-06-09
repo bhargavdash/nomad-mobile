@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "nomad-mobile",
+    "name": "Nomad",
     "slug": "nomad-mobile",
     "scheme": "nomad-mobile",
     "version": "1.0.0",
@@ -13,7 +13,8 @@
       "backgroundColor": "#F5F0E8"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.nomadmobile"
     },
     "android": {
       "adaptiveIcon": {
