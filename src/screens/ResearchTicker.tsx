@@ -48,15 +48,6 @@ function useStaggeredEntry(index: number) {
 
 // --- Sub-components ---
 
-function StatBox({ label, value }: { label: string; value: number }) {
-  return (
-    <View style={styles.statBox}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
-
 const SOURCE_PHASE_MAP: Record<string, number> = {
   youtube: 0,
   reddit: 1,
@@ -114,7 +105,6 @@ export default function ResearchTicker() {
     progress,
     progressLabel,
     displayProgress,
-    stats,
     activeSource,
     currentDiscovery,
     discoveryOpacity,
@@ -173,9 +163,8 @@ export default function ResearchTicker() {
   const titleAnim = useStaggeredEntry(0);
   const orbAnim = useStaggeredEntry(1);
   const progressAnim = useStaggeredEntry(2);
-  const statsAnim = useStaggeredEntry(3);
-  const discoveryAnim = useStaggeredEntry(4);
-  const sourcesAnim = useStaggeredEntry(5);
+  const discoveryAnim = useStaggeredEntry(3);
+  const sourcesAnim = useStaggeredEntry(4);
 
   const displayName = destination || 'your trip';
 
@@ -204,12 +193,18 @@ export default function ResearchTicker() {
         style={[styles.container, styles.errorContainer, { paddingTop: insets.top + spacing.lg }]}
       >
         <StatusBar barStyle="dark-content" backgroundColor={colors.cream} />
-        <Text style={styles.errorTitle}>Something went wrong</Text>
+        <Text style={styles.rateLimitIcon}>⚠️</Text>
+        <Text style={styles.errorTitle}>We couldn&apos;t finish this trip</Text>
         <Text style={styles.errorBody}>
-          {"We couldn't complete the research for your trip. Please try again."}
+          {
+            "The research run didn't complete — this is usually temporary. Your trip details are saved, so you can start a fresh plan or come back to it later."
+          }
         </Text>
-        <Pressable onPress={retry} style={styles.retryButton}>
-          <Text style={styles.retryLabel}>Try Again</Text>
+        <Pressable onPress={() => navigation.navigate('PlanTrip')} style={styles.retryButton}>
+          <Text style={styles.retryLabel}>Start a new plan</Text>
+        </Pressable>
+        <Pressable onPress={() => navigation.getParent()?.goBack()} style={styles.secondaryButton}>
+          <Text style={styles.secondaryLabel}>Back to my trips</Text>
         </Pressable>
       </View>
     );
@@ -247,28 +242,30 @@ export default function ResearchTicker() {
         </View>
       </Animated.View>
 
-      {/* Stats Row */}
-      <Animated.View style={[styles.statsRow, statsAnim]}>
-        <StatBox label="PLACES" value={stats.places} />
-        <View style={styles.statDivider} />
-        <StatBox label="TIPS" value={stats.tips} />
-        <View style={styles.statDivider} />
-        <StatBox label="PHOTO STOPS" value={stats.photoStops} />
-      </Animated.View>
-
       {/* Live Discovery Card */}
       <Animated.View style={[styles.discoverySection, discoveryAnim]}>
         <Animated.View style={[styles.discoveryCard, discoveryStyle]}>
           <Text style={styles.discoveryLabel}>LIVE DISCOVERY</Text>
           <Text style={styles.discoveryTitle}>{currentDiscovery.title}</Text>
           <Text style={styles.discoveryBody}>{currentDiscovery.body}</Text>
-          <View style={styles.chipRow}>
-            {currentDiscovery.tags.map((tag) => (
-              <View key={tag} style={styles.tagChip}>
-                <Text style={styles.tagChipText}>{tag}</Text>
+          {(() => {
+            const cleanedTags = [
+              ...new Set(
+                currentDiscovery.tags
+                  .map((t) => t.replace(/^[^\p{L}\p{N}\s]+\s*/u, '').trim())
+                  .filter(Boolean),
+              ),
+            ];
+            return cleanedTags.length > 0 ? (
+              <View style={styles.chipRow}>
+                {cleanedTags.map((tag) => (
+                  <View key={tag} style={styles.tagChip}>
+                    <Text style={styles.tagChipText}>{tag}</Text>
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
+            ) : null;
+          })()}
         </Animated.View>
       </Animated.View>
 
@@ -372,42 +369,6 @@ const styles = StyleSheet.create({
     height: 6,
     backgroundColor: colors.navy,
     borderRadius: 3,
-  },
-
-  // Stats
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-    borderRadius: 18,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.xl,
-    marginBottom: spacing.xl,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  statBox: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statValue: {
-    ...typography.displayM,
-    color: colors.ink,
-  },
-  statLabel: {
-    fontFamily: fontFamily.mono,
-    fontSize: 10,
-    lineHeight: 14,
-    color: colors.muted,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginTop: 2,
-  },
-  statDivider: {
-    width: 1,
-    height: 32,
-    backgroundColor: colors.border,
   },
 
   // Discovery
@@ -546,5 +507,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 20,
     color: colors.white,
+  },
+  secondaryButton: {
+    marginTop: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xl,
+  },
+  secondaryLabel: {
+    fontFamily: fontFamily.labelStrong,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.muted,
   },
 });

@@ -16,8 +16,6 @@ interface DestinationCardProps {
   name: string;
   country: string;
   duration: string;
-  /** Emoji + label badge derived from the destination's first vibe tag. */
-  signal: string;
   /** Server-resolved place image. Null → deterministic Unsplash fallback. */
   imageUrl?: string | null;
   /** Drives the fallback image when imageUrl is null or errors. */
@@ -29,7 +27,6 @@ export default function DestinationCard({
   name,
   country,
   duration,
-  signal,
   imageUrl,
   fallbackQuery,
   onPress,
@@ -64,9 +61,6 @@ export default function DestinationCard({
           {country}
         </Text>
         <Text style={styles.duration}>{duration}</Text>
-        <Text style={styles.signal} numberOfLines={1}>
-          {signal}
-        </Text>
       </View>
     </AnimatedPressable>
   );
@@ -80,7 +74,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   photoArea: {
-    height: 110,
+    height: 136,
     position: 'relative',
   },
   overlay: {
@@ -91,7 +85,8 @@ const styles = StyleSheet.create({
     height: 50,
   },
   content: {
-    padding: spacing.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   name: {
     fontFamily: fontFamily.display,
@@ -108,12 +103,6 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.body,
     fontSize: 10,
     color: 'rgba(255,255,255,0.4)',
-    marginTop: spacing.xs,
-  },
-  signal: {
-    fontFamily: fontFamily.label,
-    fontSize: 10,
-    color: colors.peach,
-    marginTop: spacing.xs,
+    marginTop: 3,
   },
 });

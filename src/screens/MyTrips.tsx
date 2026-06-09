@@ -1,3 +1,4 @@
+import { Feather } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -230,7 +231,7 @@ function TripsBody({
   if (trips.length === 0) {
     return (
       <View style={styles.stateBox}>
-        <Text style={styles.stateEmoji}>🧭</Text>
+        <Feather name="compass" size={36} color={colors.muted} style={styles.stateIcon} />
         <Text style={styles.stateTitle}>No trips yet</Text>
         <Text style={styles.stateBody}>Plan your first adventure and it&apos;ll show up here.</Text>
       </View>
@@ -341,8 +342,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     marginTop: spacing.sm,
   },
-  stateEmoji: {
-    fontSize: 36,
+  stateIcon: {
     marginBottom: spacing.sm,
   },
   stateTitle: {

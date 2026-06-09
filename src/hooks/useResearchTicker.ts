@@ -40,7 +40,7 @@ const INITIAL_DISCOVERY: ResearchDiscovery = {
   id: 'init',
   title: 'Starting your research...',
   body: 'Our AI is beginning to scan sources for the best recommendations for your trip.',
-  tags: ['#Starting'],
+  tags: ['starting'],
   source: 'youtube',
 };
 

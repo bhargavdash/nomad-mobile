@@ -77,12 +77,12 @@ const styles = StyleSheet.create({
     borderColor: colors.navy,
   },
   chipTerracottaInactive: {
-    backgroundColor: '#FFDCC4',
-    borderWidth: 0,
+    backgroundColor: '#FFFFFF',
+    borderColor: colors.border,
   },
   chipTerracottaActive: {
-    backgroundColor: '#8E4E14',
-    borderWidth: 0,
+    backgroundColor: colors.ember,
+    borderColor: colors.ember,
   },
   label: {
     fontFamily: fontFamily.body,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   labelTerracottaInactive: {
-    color: '#6F3800',
+    color: colors.ink,
   },
   labelTerracottaActive: {
     color: '#FFFFFF',

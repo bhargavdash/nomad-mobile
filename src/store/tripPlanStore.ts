@@ -2,16 +2,7 @@ import { create } from 'zustand';
 
 // --- Types ---
 
-export type TravelerCount = '1' | '2' | '3+' | 'large';
-
-export type AccommodationType =
-  | 'Boutique Villa'
-  | 'Luxury Hotel'
-  | 'Eco Lodge'
-  | 'Homestay'
-  | 'Airbnb'
-  | 'Hostel'
-  | 'Custom Stay';
+export type AccommodationType = 'Hostel' | 'Budget Hotel' | 'Luxury Hotel' | 'Airbnb / Homestay';
 
 export type PaceType = 'Slow & Soulful' | 'Balanced' | 'Action-Packed';
 
@@ -25,11 +16,11 @@ export interface DateRange {
 interface TripPlanState {
   destination: string;
   dates: DateRange;
-  travelers: TravelerCount | null;
+  travelers: string | null;
   selectedVibes: string[];
-  accommodation: AccommodationType | null;
-  pace: PaceType | null;
-  budget: BudgetTier | null;
+  accommodation: AccommodationType;
+  pace: PaceType;
+  budget: BudgetTier;
   preferences: string;
   currentTripId: string | null;
 }
@@ -37,7 +28,7 @@ interface TripPlanState {
 interface TripPlanActions {
   setDestination: (value: string) => void;
   setDates: (dates: DateRange) => void;
-  setTravelers: (value: TravelerCount) => void;
+  setTravelers: (value: string) => void;
   toggleVibe: (vibe: string) => void;
   setAccommodation: (value: AccommodationType) => void;
   setPace: (value: PaceType) => void;
@@ -52,9 +43,9 @@ const INITIAL_STATE: TripPlanState = {
   dates: { from: null, to: null },
   travelers: null,
   selectedVibes: [],
-  accommodation: null,
-  pace: null,
-  budget: null,
+  accommodation: 'Budget Hotel',
+  pace: 'Balanced',
+  budget: 'Medium',
   preferences: '',
   currentTripId: null,
 };

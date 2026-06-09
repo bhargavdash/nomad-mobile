@@ -27,12 +27,12 @@ import PrimaryButton from '@components/buttons/PrimaryButton';
 import KeywordChip from '@components/chips/KeywordChip';
 import DateRangePicker from '@components/Forms/DateRangePicker';
 import LocationSearchInput from '@components/Forms/LocationSearchInput';
+import TravelerPicker from '@components/Forms/TravelerPicker';
 import {
   VIBE_CATEGORIES,
   ACCOMMODATION_OPTIONS,
   PACE_OPTIONS,
   BUDGET_TIERS,
-  TRAVELER_OPTIONS,
 } from '@data/placeholders';
 import { api } from '@lib/api';
 import type { PlanModalParamList } from '@navigation/PlanModalNavigator';
@@ -41,7 +41,6 @@ import {
   type AccommodationType,
   type PaceType,
   type BudgetTier,
-  type TravelerCount,
 } from '@store/tripPlanStore';
 import { colors } from '@theme/colors';
 import { radius } from '@theme/radius';
@@ -69,32 +68,29 @@ function useStaggeredEntry(index: number) {
   }));
 }
 
-// --- Accommodation Card (local component) ---
+// --- Accommodation Option (single-select radio row) ---
 
-interface AccommodationCardProps {
-  icon: string;
+interface AccommodationOptionProps {
   label: string;
-  desc: string;
   active: boolean;
   onPress: () => void;
 }
 
-function AccommodationCard({ icon, label, desc, active, onPress }: AccommodationCardProps) {
+function AccommodationOption({ label, active, onPress }: AccommodationOptionProps) {
   return (
     <Pressable
       style={[
-        styles.accommodationCard,
-        active ? styles.accommodationCardActive : styles.accommodationCardInactive,
+        styles.accommodationRow,
+        active ? styles.accommodationRowActive : styles.accommodationRowInactive,
       ]}
       onPress={onPress}
+      accessibilityRole="radio"
+      accessibilityState={{ selected: active }}
     >
-      <Text style={styles.accommodationIcon}>{icon}</Text>
-      <Text style={[styles.accommodationLabel, active && styles.accommodationLabelActive]}>
-        {label}
-      </Text>
-      <Text style={[styles.accommodationDesc, active && styles.accommodationDescActive]}>
-        {desc}
-      </Text>
+      <View style={[styles.radioOuter, active && styles.radioOuterActive]}>
+        {active && <View style={styles.radioInner} />}
+      </View>
+      <Text style={styles.accommodationRowLabel}>{label}</Text>
     </Pressable>
   );
 }
@@ -320,16 +316,7 @@ export default function PlanTrip() {
 
             {/* Travelers */}
             <Text style={styles.fieldLabel}>Travelers</Text>
-            <View style={styles.chipRow}>
-              {TRAVELER_OPTIONS.map((opt) => (
-                <KeywordChip
-                  key={opt.value}
-                  label={opt.label}
-                  active={travelers === opt.value}
-                  onPress={() => setTravelers(opt.value as TravelerCount)}
-                />
-              ))}
-            </View>
+            <TravelerPicker travelers={travelers} setTravelers={setTravelers} />
           </Animated.View>
 
           {/* ── What's your vibe? ── */}
@@ -356,15 +343,13 @@ export default function PlanTrip() {
           {/* ── Accommodation ── */}
           <Animated.View style={accommodationAnim}>
             <Text style={styles.sectionLabel}>Accommodation</Text>
-            <View style={styles.accommodationGrid}>
-              {ACCOMMODATION_OPTIONS.map((opt) => (
-                <AccommodationCard
-                  key={opt.label}
-                  icon={opt.icon}
-                  label={opt.label}
-                  desc={opt.desc}
-                  active={accommodation === opt.label}
-                  onPress={() => setAccommodation(opt.label as AccommodationType)}
+            <View style={styles.accommodationList}>
+              {ACCOMMODATION_OPTIONS.map((label) => (
+                <AccommodationOption
+                  key={label}
+                  label={label}
+                  active={accommodation === label}
+                  onPress={() => setAccommodation(label as AccommodationType)}
                 />
               ))}
             </View>
@@ -380,6 +365,7 @@ export default function PlanTrip() {
                   label={opt}
                   active={pace === opt}
                   onPress={() => setPace(opt as PaceType)}
+                  variant="terracotta"
                 />
               ))}
             </View>
@@ -395,6 +381,7 @@ export default function PlanTrip() {
                   label={tier}
                   active={budget === tier}
                   onPress={() => setBudget(tier as BudgetTier)}
+                  variant="terracotta"
                 />
               ))}
             </View>
@@ -553,54 +540,50 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
 
-  // Accommodation grid
-  accommodationGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  // Accommodation single-select radio list
+  accommodationList: {
     gap: 10,
   },
-  accommodationCard: {
-    width: '48%' as unknown as number,
-    flexGrow: 1,
-    flexBasis: '46%',
-    borderRadius: radius.card,
+  accommodationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    borderRadius: 14,
     borderWidth: 1.5,
     paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.md,
-    alignItems: 'center',
+    paddingHorizontal: spacing.lg,
   },
-  accommodationCardInactive: {
+  accommodationRowInactive: {
     backgroundColor: colors.white,
     borderColor: colors.border,
   },
-  accommodationCardActive: {
-    backgroundColor: colors.navy,
-    borderColor: colors.navy,
+  accommodationRowActive: {
+    backgroundColor: colors.emberLight,
+    borderColor: colors.ember,
   },
-  accommodationIcon: {
-    fontSize: 28,
-    marginBottom: spacing.sm,
+  radioOuter: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  accommodationLabel: {
+  radioOuterActive: {
+    borderColor: colors.ember,
+  },
+  radioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: colors.ember,
+  },
+  accommodationRowLabel: {
     fontFamily: fontFamily.labelStrong,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 15,
+    lineHeight: 20,
     color: colors.ink,
-    textAlign: 'center',
-  },
-  accommodationLabelActive: {
-    color: colors.white,
-  },
-  accommodationDesc: {
-    fontFamily: fontFamily.body,
-    fontSize: 11,
-    lineHeight: 16,
-    color: colors.muted,
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  accommodationDescActive: {
-    color: 'rgba(255,255,255,0.55)',
   },
 
   // Sticky CTA

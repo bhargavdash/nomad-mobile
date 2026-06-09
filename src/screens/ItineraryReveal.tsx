@@ -1,3 +1,4 @@
+import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useCallback, useMemo, useRef, useState } from 'react';
@@ -10,7 +11,6 @@ import {
   StatusBar,
   ActivityIndicator,
   Modal,
-  Share,
   type NativeSyntheticEvent,
   type NativeScrollEvent,
   type LayoutChangeEvent,
@@ -79,6 +79,11 @@ const OVERLAY_10 = 'rgba(255,255,255,0.10)';
 const OVERLAY_15 = 'rgba(255,255,255,0.15)';
 
 type SourceKey = keyof typeof SOURCE_BADGE_COLORS;
+
+// Strip leading emoji from AI-generated tags (old trips may have emoji prefixes).
+function cleanTag(t: string): string {
+  return t.replace(/^[^\p{L}\p{N}\s]+\s*/u, '').trim();
+}
 
 function isSourceKey(source: string | null): source is SourceKey {
   return source != null && source in SOURCE_BADGE_COLORS;
@@ -176,7 +181,11 @@ function PostcardCard({ stop, index, exiting, onLockToggle, onRemove }: Postcard
             hitSlop={8}
             accessibilityLabel={stop.locked ? 'Unlock stop' : 'Lock stop'}
           >
-            <Text style={styles.lockGlyph}>{stop.locked ? '🔒' : '🔓'}</Text>
+            <Feather
+              name={stop.locked ? 'lock' : 'unlock'}
+              size={14}
+              color="rgba(255,255,255,0.8)"
+            />
           </AnimatedPressable>
           <Pressable
             style={styles.iconBtnPlain}
@@ -184,22 +193,26 @@ function PostcardCard({ stop, index, exiting, onLockToggle, onRemove }: Postcard
             hitSlop={8}
             accessibilityLabel="Stop options"
           >
-            <Text style={styles.moreGlyph}>⋯</Text>
+            <Feather name="more-horizontal" size={18} color="rgba(255,255,255,0.6)" />
           </Pressable>
         </View>
       </View>
 
       {!!stop.description && <Text style={styles.stopDesc}>{stop.description}</Text>}
 
-      {stop.tags.length > 0 && (
-        <View style={styles.tagsRow}>
-          {stop.tags.map((t) => (
-            <View key={t} style={[styles.tag, stop.locked && styles.tagLocked]}>
-              <Text style={[styles.tagText, stop.locked && styles.tagTextLocked]}>{t}</Text>
+      {stop.tags.length > 0 &&
+        (() => {
+          const cleanedTags = [...new Set(stop.tags.map(cleanTag).filter(Boolean))];
+          return cleanedTags.length > 0 ? (
+            <View style={styles.tagsRow}>
+              {cleanedTags.map((t) => (
+                <View key={t} style={[styles.tag, stop.locked && styles.tagLocked]}>
+                  <Text style={[styles.tagText, stop.locked && styles.tagTextLocked]}>{t}</Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
-      )}
+          ) : null;
+        })()}
 
       <Modal
         visible={menuOpen}
@@ -283,17 +296,6 @@ export default function ItineraryReveal() {
   const handleBack = useCallback(() => {
     navigation.getParent()?.goBack();
   }, [navigation]);
-
-  const handleShare = useCallback(async () => {
-    if (!data) return;
-    try {
-      await Share.share({
-        message: `My ${data.trip.destination} itinerary — planned with Nomad`,
-      });
-    } catch {
-      // user dismissed or share unavailable — nothing to recover
-    }
-  }, [data]);
 
   const updateStop = useCallback((stopId: string, fn: (s: TripStop) => TripStop) => {
     setData((prev) => applyStopUpdate(prev, stopId, fn));
@@ -436,9 +438,6 @@ export default function ItineraryReveal() {
             <View style={[styles.heroTopRow, { paddingTop: insets.top + spacing.sm }]}>
               <Pressable onPress={handleBack} style={styles.heroPill} hitSlop={8}>
                 <Text style={styles.heroPillText}>← Back</Text>
-              </Pressable>
-              <Pressable onPress={handleShare} style={styles.heroPill} hitSlop={8}>
-                <Text style={styles.heroPillText}>Share ↗</Text>
               </Pressable>
             </View>
             <View style={styles.heroBottom}>
@@ -919,14 +918,6 @@ const styles = StyleSheet.create({
     backgroundColor: OVERLAY_8,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  lockGlyph: {
-    fontSize: 14,
-  },
-  moreGlyph: {
-    fontSize: 18,
-    lineHeight: 18,
-    color: 'rgba(255,255,255,0.6)',
   },
   stopDesc: {
     ...typography.bodyS,
