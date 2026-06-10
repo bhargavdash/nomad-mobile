@@ -43,6 +43,7 @@ ios/Pods/
 android/build/
 android/app/build/
 android/.gradle/
+android/app/release/
 
 .claude/settings.local.json
 
