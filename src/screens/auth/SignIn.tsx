@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { handleOAuthRedirect } from '../../lib/auth';
+import { authRedirectUrl, handleOAuthRedirect } from '../../lib/auth';
 import { supabase } from '../../lib/supabase';
 import { AuthStackParamList } from '../../navigation/AuthNavigator';
 import { colors } from '../../theme/colors';
@@ -40,13 +40,23 @@ export default function SignIn({ navigation }: Props) {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) Alert.alert('Sign in failed', error.message);
+    if (error) {
+      // Unconfirmed accounts can't sign in — route them to OTP verification
+      if (error.message.toLowerCase().includes('not confirmed')) {
+        Alert.alert('Email not verified', 'Enter the code we emailed you to verify your account.', [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Enter code', onPress: () => navigation.navigate('VerifyEmail', { email }) },
+        ]);
+      } else {
+        Alert.alert('Sign in failed', error.message);
+      }
+    }
     // On success, the auth listener in RootNavigator handles navigation
   }
 
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
-    const redirectTo = 'nomad://auth/callback';
+    const redirectTo = authRedirectUrl;
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo, skipBrowserRedirect: true },

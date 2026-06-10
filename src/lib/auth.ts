@@ -4,6 +4,14 @@ import { Alert } from 'react-native';
 import { supabase } from './supabase';
 
 /**
+ * OAuth/deep-link callback URL derived from the app scheme in app.json
+ * ("nomad-mobile"). Must be listed in Supabase → Auth → URL Configuration →
+ * Redirect URLs. Never hardcode the scheme — Android resolves callbacks via
+ * the manifest intent filter, so a mismatched scheme dead-ends silently.
+ */
+export const authRedirectUrl = Linking.createURL('auth/callback');
+
+/**
  * Parses key=value pairs from a URL fragment (#...).
  * Linking.parse only handles query params, not fragments.
  */

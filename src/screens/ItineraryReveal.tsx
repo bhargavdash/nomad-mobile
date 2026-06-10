@@ -407,6 +407,7 @@ export default function ItineraryReveal() {
     !!trip.routeSummary ||
     !!trip.transportStrategy ||
     !!trip.budgetEstimate ||
+    !!trip.currencyAdvice ||
     trip.seasonalTips.length > 0 ||
     (!!trip.stayByCity && Object.keys(trip.stayByCity).length > 0);
 
@@ -462,6 +463,9 @@ export default function ItineraryReveal() {
               )}
               {!!trip.budgetEstimate && (
                 <OverviewCard label="ROUGH BUDGET" value={trip.budgetEstimate} />
+              )}
+              {!!trip.currencyAdvice && (
+                <OverviewCard label="CURRENCY TIPS" value={trip.currencyAdvice} />
               )}
               {trip.seasonalTips.length > 0 && (
                 <OverviewCard label="GOOD TO KNOW" value={trip.seasonalTips.join(' · ')} />

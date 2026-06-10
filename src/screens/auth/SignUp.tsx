@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { handleOAuthRedirect } from '../../lib/auth';
+import { authRedirectUrl, handleOAuthRedirect } from '../../lib/auth';
 import { supabase } from '../../lib/supabase';
 import { AuthStackParamList } from '../../navigation/AuthNavigator';
 import { colors } from '../../theme/colors';
@@ -42,27 +42,27 @@ export default function SignUp({ navigation }: Props) {
       return;
     }
     setLoading(true);
-    const redirectTo = 'nomad://auth/callback';
-    const { error } = await supabase.auth.signUp({
+    // No emailRedirectTo — confirmation is done in-app via 6-digit OTP code
+    // ({{ .Token }} in the Supabase email template), not a magic link.
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name }, emailRedirectTo: redirectTo },
+      options: { data: { full_name: name } },
     });
     setLoading(false);
     if (error) {
       Alert.alert('Sign up failed', error.message);
-    } else {
-      Alert.alert(
-        'Check your email',
-        'We sent you a confirmation link. Tap it to activate your account, then sign in.',
-        [{ text: 'OK', onPress: () => navigation.navigate('SignIn') }],
-      );
+    } else if (!data.session) {
+      // Confirmation pending — verify via OTP code. If Supabase ever has
+      // confirmation disabled, a session exists and the RootNavigator
+      // auth listener navigates on its own.
+      navigation.navigate('VerifyEmail', { email });
     }
   }
 
   async function handleGoogleSignIn() {
     setGoogleLoading(true);
-    const redirectTo = 'nomad://auth/callback';
+    const redirectTo = authRedirectUrl;
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo, skipBrowserRedirect: true },
