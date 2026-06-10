@@ -20,6 +20,10 @@ import { colors } from '../../theme/colors';
 
 type Props = NativeStackScreenProps<AuthStackParamList, 'VerifyEmail'>;
 
+// Must match "Email OTP Length" in the Supabase dashboard
+// (Authentication → Sign In / Providers → Email).
+const OTP_LENGTH = 6;
+
 export default function VerifyEmail({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
   const { email } = route.params;
@@ -28,8 +32,8 @@ export default function VerifyEmail({ navigation, route }: Props) {
   const [resending, setResending] = useState(false);
 
   async function handleVerify() {
-    if (code.length !== 6) {
-      Alert.alert('Invalid code', 'Enter the 6-digit code from your email.');
+    if (code.length !== OTP_LENGTH) {
+      Alert.alert('Invalid code', `Enter the ${OTP_LENGTH}-digit code from your email.`);
       return;
     }
     setLoading(true);
@@ -72,7 +76,7 @@ export default function VerifyEmail({ navigation, route }: Props) {
         <View style={styles.form}>
           <Text style={styles.title}>Verify your email</Text>
           <Text style={styles.subtitle}>
-            Enter the 6-digit code we sent to{'\n'}
+            Enter the {OTP_LENGTH}-digit code we sent to{'\n'}
             <Text style={styles.emailText}>{email}</Text>
           </Text>
 
@@ -80,14 +84,14 @@ export default function VerifyEmail({ navigation, route }: Props) {
             <Text style={styles.label}>Verification code</Text>
             <TextInput
               style={styles.codeInput}
-              placeholder="000000"
+              placeholder={'0'.repeat(OTP_LENGTH)}
               placeholderTextColor={colors.muted}
               value={code}
-              onChangeText={(v) => setCode(v.replace(/\D/g, '').slice(0, 6))}
+              onChangeText={(v) => setCode(v.replace(/\D/g, '').slice(0, OTP_LENGTH))}
               keyboardType="number-pad"
               autoComplete="one-time-code"
               textContentType="oneTimeCode"
-              maxLength={6}
+              maxLength={OTP_LENGTH}
             />
           </View>
 
